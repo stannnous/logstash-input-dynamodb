@@ -53,18 +53,18 @@ module Logstash
           data_hash = JSON.parse(@mapper.writeValueAsString(log))
 
           @hash_template["dynamodb"] = Hash.new
-          @hash_template["dynamodb"]["keys"] = Hash.new
+          @hash_template["dynamodb"]["Keys"] = Hash.new
           size_bytes = calculate_key_size_in_bytes(log)
           @key_schema.each { |x|
-            @hash_template["dynamodb"]["keys"][x] = data_hash[x]
+            @hash_template["dynamodb"]["Keys"][x] = data_hash[x]
           }
           unless @view_type == "keys_only"
             size_bytes += new_image_size
-            @hash_template["dynamodb"]["newImage"] = data_hash
+            @hash_template["dynamodb"]["NewImage"] = data_hash
           end
-          @hash_template["dynamodb"]["sequenceNumber"] = "0"
-          @hash_template["dynamodb"]["sizeBytes"] = size_bytes
-          @hash_template["dynamodb"]["streamViewType"] = @view_type.upcase
+          @hash_template["dynamodb"]["SequenceNumber"] = "0"
+          @hash_template["dynamodb"]["SizeBytes"] = size_bytes
+          @hash_template["dynamodb"]["StreamViewType"] = @view_type.upcase
 
           return parse_view_type(@hash_template)
         end
@@ -100,11 +100,11 @@ module Logstash
           end
           case @view_type
           when LogStash::Inputs::DynamoDB::VT_KEYS_ONLY
-            return parse_format(hash["dynamodb"]["keys"])
+            return parse_format(hash["dynamodb"]["Keys"])
           when LogStash::Inputs::DynamoDB::VT_OLD_IMAGE
-            return parse_format(hash["dynamodb"]["oldImage"])
+            return parse_format(hash["dynamodb"]["OldImage"])
           when LogStash::Inputs::DynamoDB::VT_NEW_IMAGE
-            return parse_format(hash["dynamodb"]["newImage"]) #check new and old, dynamodb.
+            return parse_format(hash["dynamodb"]["NewImage"]) #check new and old, dynamodb.
           end
         end
 

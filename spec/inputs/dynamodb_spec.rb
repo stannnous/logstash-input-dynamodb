@@ -14,7 +14,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-require "spec/spec_helper"
+require "spec_helper"
 
 class LogStash::Inputs::TestDynamoDB < LogStash::Inputs::DynamoDB
   default :codec, 'json'
