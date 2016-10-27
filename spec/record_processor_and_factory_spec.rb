@@ -14,7 +14,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-require "spec_helper"
+require "spec/spec_helper"
 
 describe 'inputs/LogStashRecordProcessor' do
   before(:each) do

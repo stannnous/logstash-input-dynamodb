@@ -128,7 +128,7 @@ def sample_scan_result
 end
 def sample_stream_result
   {"internalObject" => {"eventID" => "0","eventName" => "INSERT","eventVersion" => "1.0", \
-    "eventSource" => "aws:dynamodb","awsRegion" => "us-west-1","dynamodb" => {"Keys" => {"TBCZDPHPXUTOTYGP" => {"S" => "sampleString"}, \
-    "some bin key" => {"B" => "actualbinval"}}, "NewImage" => {"TBCZDPHPXUTOTYGP" => {"S" => "sampleString"}, \
-    "some bin key" => {"B" => "actualbinval"}},"SequenceNumber" => "0","SizeBytes" => 48,"StreamViewType" => LogStash::Inputs::DynamoDB::VT_ALL_IMAGES.upcase}}}
+    "eventSource" => "aws:dynamodb","awsRegion" => "us-west-1","dynamodb" => {"keys" => {"TBCZDPHPXUTOTYGP" => {"S" => "sampleString"}, \
+    "some bin key" => {"B" => "actualbinval"}}, "newImage" => {"TBCZDPHPXUTOTYGP" => {"S" => "sampleString"}, \
+    "some bin key" => {"B" => "actualbinval"}},"sequenceNumber" => "0","sizeBytes" => 48,"streamViewType" => LogStash::Inputs::DynamoDB::VT_ALL_IMAGES.upcase}}}
 end
