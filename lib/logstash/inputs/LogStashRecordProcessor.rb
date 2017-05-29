@@ -42,15 +42,17 @@ module Logstash
         end
 
         def process_records(records, checkpointer)
-          @logger.debug("Processing batch of " + records.size().to_s + " records")
+          @logger.info("Processing batch of " + records.size().to_s + " records")
           records.each do |record|
             @queue.push(record)
           end
+          @logger.info("Checkpoint batch of " + records.size().to_s + " records")
           #checkpoint once all of the records have been consumed
           checkpointer.checkpoint()
         end
 
         def shutdown(checkpointer, reason)
+          @logger.info("shutting down record processor with reason " + reason.to_s)
           case reason
           when ShutdownReason::TERMINATE
             checkpointer.checkpoint()

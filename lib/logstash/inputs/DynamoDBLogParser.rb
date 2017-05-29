@@ -24,6 +24,7 @@ require "logstash-input-dynamodb_jars"
 java_import "com.fasterxml.jackson.databind.ObjectMapper"
 java_import "com.amazonaws.services.dynamodbv2.model.AttributeValue"
 java_import "com.amazonaws.dynamodb.bootstrap.AttributeValueMixIn"
+java_import "org.apache.log4j.LogManager"
 
 module Logstash
   module Inputs
@@ -46,6 +47,7 @@ module Logstash
           @hash_template["eventVersion"] = "1.0"
           @hash_template["eventSource"] = "aws:dynamodb"
           @hash_template["awsRegion"] = region
+          @logger ||= LogStash::Inputs::DynamoDB.logger
         end
 
         public
@@ -71,6 +73,7 @@ module Logstash
 
         public
         def parse_stream(log)
+          @logger.info("Parse stream called")
           return parse_view_type(JSON.parse(@mapper.writeValueAsString(log))["internalObject"])
         end
 
@@ -96,23 +99,30 @@ module Logstash
         private
         def parse_view_type(hash)
           if @log_format == LogStash::Inputs::DynamoDB::LF_PLAIN
+            @logger.info("Parse view type plain")
             return hash.to_json
           end
           case @view_type
           when LogStash::Inputs::DynamoDB::VT_KEYS_ONLY
+            @logger.info("Parse view type keys only")
             return parse_format(hash["dynamodb"]["keys"])
           when LogStash::Inputs::DynamoDB::VT_OLD_IMAGE
+            @logger.info("Parse view type old image")
             return parse_format(hash["dynamodb"]["oldImage"])
           when LogStash::Inputs::DynamoDB::VT_NEW_IMAGE
+            @logger.info("Parse view type new image")
             return parse_format(hash["dynamodb"]["newImage"]) #check new and old, dynamodb.
           end
+          @logger.info("Parse view type done")
         end
 
         private
         def parse_format(hash)
           if @log_format == LogStash::Inputs::DynamoDB::LF_DYNAMODB
+            @logger.info("Parse format hash")
             return hash.to_json
           else
+            @logger.info("Parse format dynamodb")
             return dynamodb_to_json(hash)
           end
         end

@@ -258,15 +258,26 @@ class LogStash::Inputs::DynamoDB < LogStash::Inputs::Base
 
     kcl_config = KCL::KinesisClientLibConfiguration.new(@checkpointer, stream_arn, @credentials, worker_id) \
       .withInitialPositionInStream(KCL::InitialPositionInStream::TRIM_HORIZON)
-		cloudwatch_client = nil
+    cloudwatch_client = nil
     if @publish_metrics
       cloudwatch_client = CloudWatch::AmazonCloudWatchClient.new(@credentials)
     else
+      kcl_config.withMetricsLevel(KCL::MetricsLevel::NONE)
+
       kclMetricsLogger = LogManager.getLogger("com.amazonaws.services.kinesis.metrics")
       kclMetricsLogger.setAdditivity(false)
       kclMetricsLogger.setLevel(Level::OFF)
     end # if @publish_metrics
+
+    kinesis_logger = org.apache.commons.logging::LogFactory.getLog("com.amazonaws.services.kinesis.clientlibrary.lib.worker").logger
+    if kinesis_logger.java_kind_of?(java.util.logging::Logger)
+      kinesis_logger.setLevel(java.util.logging::Level::INFO)
+    else
+      kinesis_logger.setLevel(org.apache.log4j::Level::DEBUG)
+    end
+
     @worker = KCL::Worker.new(Logstash::Inputs::DynamoDB::LogStashRecordProcessorFactory.new(@queue), kcl_config, adapter, @dynamodb_client, cloudwatch_client)
+    @logger.info("Worker ready")
   end # def setup_stream
 
   private
@@ -331,8 +342,10 @@ class LogStash::Inputs::DynamoDB < LogStash::Inputs::Base
   def start_kcl_thread
     @kcl_thread = Thread.new(@worker) {
       begin
+        @logger.info("Running worker")
         @worker.run()
       rescue Exception => e
+        @logger.info("KCL worker encountered an error.\n" + e.message)
         abort("KCL worker encountered an error.\n" + e.message)
       end # begin
     }
