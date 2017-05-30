@@ -270,12 +270,9 @@ class LogStash::Inputs::DynamoDB < LogStash::Inputs::Base
       kclMetricsLogger.setLevel(Level::OFF)
     end # if @publish_metrics
 
-    kinesis_logger = org.apache.commons.logging::LogFactory.getLog("com.amazonaws.services.kinesis.clientlibrary.lib.worker").logger
-    if kinesis_logger.java_kind_of?(java.util.logging::Logger)
-      kinesis_logger.setLevel(java.util.logging::Level::INFO)
-    else
-      kinesis_logger.setLevel(org.apache.log4j::Level::DEBUG)
-    end
+    kinesis_logger = LogManager.getLogger("com.amazonaws.services.kinesis.clientlibrary.lib.worker")
+    kinesis_logger.setAdditivity(true)
+    kinesis_logger.setLevel(Level::DEBUG)
 
     @worker = KCL::Worker.new(Logstash::Inputs::DynamoDB::LogStashRecordProcessorFactory.new(@queue), kcl_config, adapter, @dynamodb_client, cloudwatch_client)
     @logger.info("Worker ready")
