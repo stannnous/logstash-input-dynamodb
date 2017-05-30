@@ -52,6 +52,7 @@ end
 
 module KCL
   include_package "com.amazonaws.services.kinesis.clientlibrary.lib.worker"
+  include_package "com.amazonaws.services.kinesis.metrics.interfaces"
 end
 
 #DynamoDBStreams plugin that will first scan the DynamoDB table
