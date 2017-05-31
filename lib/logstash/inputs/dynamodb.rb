@@ -278,12 +278,12 @@ class LogStash::Inputs::DynamoDB < LogStash::Inputs::Base
     root_logger = LogManager.getRootLogger
     root_logger.setLevel(Level::DEBUG)
     root_logger.addAppender(ConsoleAppender.new(layout))
-    root_logger.addAppender(RollingFileAppender.new(layout, "kcl.log"))
+    root_logger.addAppender(RollingFileAppender.new(layout, "/tmp/kcl.log"))
 
     kinesis_logger = LogManager.getLogger("com.amazonaws.services.kinesis.clientlibrary.lib.worker")
     kinesis_logger.setLevel(Level::DEBUG)
     kinesis_logger.addAppender(ConsoleAppender.new(layout))
-    kinesis_logger.addAppender(RollingFileAppender.new(layout, "kcl.log"))
+    kinesis_logger.addAppender(RollingFileAppender.new(layout, "/tmp/kcl.log"))
 
     @worker = KCL::Worker.new(Logstash::Inputs::DynamoDB::LogStashRecordProcessorFactory.new(@queue), kcl_config, adapter, @dynamodb_client, cloudwatch_client)
     @logger.info("Worker ready")
