@@ -28,6 +28,7 @@ require 'java'
 java_import "com.amazonaws.AmazonClientException"
 java_import "org.apache.log4j.LogManager"
 java_import "org.apache.log4j.Level"
+java_import "org.apache.log4j.ConsoleAppender"
 java_import "com.fasterxml.jackson.annotation.JsonInclude"
 java_import "com.amazonaws.regions.RegionUtils"
 
@@ -270,9 +271,13 @@ class LogStash::Inputs::DynamoDB < LogStash::Inputs::Base
       kclMetricsLogger.setLevel(Level::OFF)
     end # if @publish_metrics
 
+    root_logger = LogManager.getRootLogger
+    root_logger.setLevel(Level::DEBUG)
+    root_logger.addAppender(ConsoleAppender.new)
+
     kinesis_logger = LogManager.getLogger("com.amazonaws.services.kinesis.clientlibrary.lib.worker")
-    kinesis_logger.setAdditivity(true)
     kinesis_logger.setLevel(Level::DEBUG)
+    kinesis_logger.addAppender(ConsoleAppender.new)
 
     @worker = KCL::Worker.new(Logstash::Inputs::DynamoDB::LogStashRecordProcessorFactory.new(@queue), kcl_config, adapter, @dynamodb_client, cloudwatch_client)
     @logger.info("Worker ready")
